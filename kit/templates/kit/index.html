@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+These are the categories
+<ul>
+    {% for category in categories %}
+        <li><a href="{% url 'kit:questions'  category_name=category %}">{{ category }}</a></li>
+    {% endfor %}
+</ul>
+</body>
+</html>
