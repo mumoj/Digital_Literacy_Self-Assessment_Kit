@@ -16,7 +16,6 @@ class QuestionsPageView(View):
         context = {
             'categories': Category.objects.all()
         }
-        print(context['categories'])
         return render(request, self.template, context)
 
     def post(self, request, *args, **kwargs):
