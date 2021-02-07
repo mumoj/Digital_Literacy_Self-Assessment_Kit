@@ -1,0 +1,50 @@
+{%extends 'kit_base.html'%}
+{%load static%}
+{%block title%}Assessment Test{%endblock%}
+{% block style %}
+    <style>
+        * {
+            box-sizing: border-box;}
+
+        body {
+            background-color: #f1f1f1;}
+
+        h3,h5 {
+            text-align: center;}
+
+        .results{
+            background-color: #ffffff;
+            margin: 100px auto;
+            padding: 40px;
+            width: 50%;
+            max-width: 500px;
+        }
+
+    </style>
+{%endblock%}
+{%block content%}
+
+    <div class="results">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Category</th>
+                    <th scope="col">Marks</th>
+                <tr>
+            </thead>
+            <tbody>
+                {% for key, value  in marks_per_category.items %}
+                    <tr>
+                        <td> {{ key }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <th scope="row"> Total Marks </th>
+                    <td>{{ total_marks_scored }}/{{ test_total_marks }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

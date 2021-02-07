@@ -1,0 +1,25 @@
+{% extends 'kit_base.html' %}
+{% load static %}
+{% block title %} Digital Literacy Self Assessment Kit {% endblock %}
+{% block content %}
+    <div class ="container">
+          <div class="row  mt-5 justify-content-center ">
+              <div class="col-sm-6 bg-transparent border rounded border-dark">
+                  <p>
+                        Digital literacy has become an essential skill in the life of the average Kenyan.
+                        This <b>Digital Literacy Assessment Kit </b> is designed to assess your proficiency in the
+                        most ubiquitous digital platforms. These platforms are:
+                        <ol>
+                            <li> Desktop Computers </li>
+                            <li> Mobile phones</li>
+                            <li> Mobile banking </li>
+                            <li> Social Media </li>
+                        </ol>
+
+                  <div class="col text-center mb-3 ">
+                    <a href="{% url 'kit:questions' %}"  type="button" class="btn btn-outline-dark">Get Started </a>
+                  </div>
+               </div>
+          </div>
+    </div>
+{% endblock %}

@@ -1,71 +1,82 @@
-from django.views.generic import (ListView, UpdateView)
+from django.views.generic import TemplateView
 from django.views import View
-from .models import Question, Category, Answer, UserResponse
+from .models import Question, Category, Answer
 from django.shortcuts import render, redirect
 from django.contrib import messages
-# from .forms import QuestionForm
 
 
-class IndexView(View):
-    template = 'kit/index.html'
-
-    def get(self, request):
-        context = {
-            'categories': Category.objects.all()
-        }
-        return render(request, template_name=self.template, context=context)
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
 
 class QuestionsPageView(View):
-    template = 'kit/questions.html'
+    template = 'questions.html'
 
     def get(self, request, *args, **kwargs):
-        category = self.kwargs.get('category_name', '')
         context = {
-            'current_category': category,
-            'questions': Question.objects.filter(category__name=category)
+            'categories': Category.objects.all()
         }
+        print(context['categories'])
         return render(request, self.template, context)
 
     def post(self, request, *args, **kwargs):
         data = dict(request.POST.copy())
         data.pop('csrfmiddlewaretoken')
 
-        user_responses = []
+        request.session['marks_per_category'] = calculate_marks_per_category(data=data)
 
-        for key in data:
-            question = Question.objects.get(id=int(key))
-
-            user_answers = []
-            for ans_id in data[key]:
-                answer = Answer.objects.get(id=int(ans_id))
-                user_answers.append(answer)
-
-            user_responses.append({'question': question, 'user_answers': user_answers})
-
-        return redirect('/results?score={}'.format(calculate_score(user_responses)))
+        return redirect('kit:results')
 
 
 class ResultsView(View):
-    template = 'kit/results.html'
+    template = 'results.html'
 
     def get(self, request):
-        context = {}
-        score = request.GET.get('score', None)
+        marks_per_category = request.session.get('marks_per_category')
 
-        if score is not None:
-            context['score'] = score
+        context = {
+            'marks_per_category': marks_per_category,
+            'total_marks_scored': calculate_total_marks_scored(marks_per_category),
+            'test_total_marks': calculate_test_total_marks(),
+        }
 
-            return render(request, self.template, context)
-
-        return redirect('/')
+        return render(request, self.template, context)
 
 
-def calculate_score(user_responses):
-    scored_marks = 0
+def calculate_marks_per_category(data) -> dict:
+    """Calculate the marks per category."""
 
-    for resp in user_responses:
-        for answer in resp['user_answers']:
-            scored_marks += answer.weight or 0
+    categories = Category.objects.all()
+    marks_per_category = {category.name: 0 for category in categories}
 
-    return scored_marks
+    for key in data:
+        question = Question.objects.get(id=int(key))
+        user_answer = Answer.objects.get(id=int(data[key][0]))
+
+        if user_answer.answer == str(question.correct_answer):
+            marks_per_category[str(question.category)] += user_answer.weight
+        else:
+            marks_per_category[str(question.category)] += 0
+
+    return marks_per_category
+
+
+def calculate_total_marks_scored(marks_per_category: dict) -> int:
+    """Calculate the total marks the user scored."""
+
+    total_marks = 0
+
+    for marks in marks_per_category.values():
+        total_marks += marks
+    return total_marks
+
+
+def calculate_test_total_marks() -> int:
+    """Calculate the total marks for the test."""
+
+    questions = Question.objects.all()
+    total_marks = 0
+
+    for question in questions:
+        total_marks += int(question.correct_answer.weight)
+    return total_marks
