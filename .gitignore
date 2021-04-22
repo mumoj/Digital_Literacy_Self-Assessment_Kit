@@ -1,8 +1,9 @@
 db.sqlite3
 .idea/
+.coverage
+.env
 *.pyc
 __pycache__
 htmlcov/
-.coverage
-.env
+
 
