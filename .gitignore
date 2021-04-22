@@ -4,6 +4,5 @@ db.sqlite3
 __pycache__
 htmlcov/
 .coverage
-.vscode/
 .env
 
